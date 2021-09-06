@@ -37,8 +37,8 @@ The atmospheric scattering in this cubemap is calculated in yet an other Compute
 
 ## **Render Samples**
 
-![img1](https://github.com/JulianStambuk/OpenTK-PathTracer/blob/main/Screenshots/img1.png?raw=true)
+![img1](https://github.com/Starklosch/OpenTK-PathTracer/blob/main/Screenshots/img1.png?raw=true)
 
-![img2](https://github.com/JulianStambuk/OpenTK-PathTracer/blob/main/Screenshots/img2.png?raw=true)
+![img2](https://github.com/Starklosch/OpenTK-PathTracer/blob/main/Screenshots/img2.png?raw=true)
 
-![img3](https://github.com/JulianStambuk/OpenTK-PathTracer/blob/main/Screenshots/img3.png?raw=true)
+![img3](https://github.com/Starklosch/OpenTK-PathTracer/blob/main/Screenshots/img3.png?raw=true)
