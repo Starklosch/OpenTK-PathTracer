@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Linq;
-
 using OpenTK;
 using OpenTK.Graphics.OpenGL4;
 
 namespace OpenTK_PathTracer.Render.Objects
 {
-    class Shader : IDisposable
+    struct Shader : IDisposable
     {
         public readonly int ID;
         public readonly string Path;
@@ -36,7 +35,7 @@ namespace OpenTK_PathTracer.Render.Objects
         }
     }
 
-    class ShaderProgram : IDisposable
+    struct ShaderProgram : IDisposable
     {
         public readonly int ID;
 

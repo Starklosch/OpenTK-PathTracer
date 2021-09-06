@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-
 using OpenTK.Graphics.OpenGL4;
 
 namespace OpenTK_PathTracer.Render.Objects
@@ -32,7 +31,7 @@ namespace OpenTK_PathTracer.Render.Objects
         {
             if (bufferTypeBindingIndexDict[bufferRangeTarget].Contains(bindingIndex))
             {
-                Console.WriteLine($"BufferObject: BindingIndex {bindingIndex} is already bound to an other {bufferRangeTarget}");
+                Console.WriteLine($"BufferObject: BindingIndex {bindingIndex} is already bound to a {bufferRangeTarget}");
                 bufferTypeBindingIndexDict[bufferRangeTarget].Add(bindingIndex);
             }
             BufferTarget = (BufferTarget)bufferRangeTarget;
@@ -48,7 +47,7 @@ namespace OpenTK_PathTracer.Render.Objects
             BufferTarget = bufferTarget;
             BufferUsageHint = bufferUsageHint;
             ID = GL.GenBuffer();
-            GL.BindBuffer(bufferTarget, ID);
+            Bind();
             Allocate(size);
         }
 
@@ -127,6 +126,7 @@ namespace OpenTK_PathTracer.Render.Objects
             GL.GetBufferSubData(BufferTarget, (IntPtr)offset, size, data);
             GL.BindBuffer(BufferTarget, 0);
         }
+
         public void GetSubData(int offset, int size, IntPtr data)
         {
             GL.BindBuffer(BufferTarget, ID);

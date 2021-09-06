@@ -1,12 +1,11 @@
 ﻿using OpenTK;
 using OpenTK.Graphics.OpenGL4;
-
 using OpenTK_PathTracer.Render.Objects;
 using System.Drawing;
 
 namespace OpenTK_PathTracer.Render
 {
-    class Rasterizer : RenderEffect
+    class Rasterizer : RenderEffectBase
     {
         private readonly VAO vao;
         private readonly BufferObject vbo;
@@ -36,7 +35,7 @@ namespace OpenTK_PathTracer.Render
             vao.Bind();
             GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
             
-            AABB[] aabbs = (AABB[])aabbArr[0];
+            AABB[] aabbs = aabbArr[0] as AABB[];
             for (int i = 0; i < aabbs.Length; i++)
             {
                 Matrix4 model = Matrix4.CreateScale(aabbs[i].Dimensions) * Matrix4.CreateTranslation(aabbs[i].Position);
