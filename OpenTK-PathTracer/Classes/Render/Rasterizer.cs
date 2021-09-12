@@ -18,7 +18,7 @@ namespace OpenTK_PathTracer.Render
             
             Framebuffer.AddRenderTarget(FramebufferAttachment.ColorAttachment0, Result);
             
-            Program = new ShaderProgram(new Shader(ShaderType.VertexShader, @"Src\Shaders\Rasterizer\vertex.vert"), new Shader(ShaderType.FragmentShader, @"Src\Shaders\Rasterizer\fragment.frag"));
+            Program = new ShaderProgram(new Shader(ShaderType.VertexShader, @"Src\Shaders\Rasterisation\vertex.vert"), new Shader(ShaderType.FragmentShader, @"Src\Shaders\Rasterisation\fragment.frag"));
 
             vao = new VAO();
             {
