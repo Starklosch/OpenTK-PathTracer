@@ -2,9 +2,9 @@
 
 ---
 
-This is a working fork of [this repo main branch](https://github.com/JulianStambuk/OpenTK-PathTracer/tree/main) with some differences:
-- It doesn't depend on ARB_bindless_texture, ARB_direct_state_access, GL_ARB_seamless_cubemap_per_texture and some other extensions used in the mentioned repo.
-- Compatible with OpenGL 4.3 and earlier.
+This is a working fork of [this repo](https://github.com/JulianStambuk/OpenTK-PathTracer/tree/master) with some differences:
+- Doesn't depend on ARB_bindless_texture, ARB_direct_state_access and ARB_seamless_cubemap_per_texture
+- Compatible with OpenGL 4.3 and newer.
 - ImGui not implemented yet.
 - Minor changes.
 

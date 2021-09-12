@@ -29,18 +29,6 @@ namespace OpenTK_PathTracer.Render.Objects
         public int Height { get; private set; }
         public int Depth { get; private set; }
 
-        private long _textureHandle = -1;
-        public long TextureHandle
-        {
-            get
-            {
-                if (_textureHandle == -1)
-                    throw new Exception("Texture: Texture is not made bindless yet. Call MakeBindless()");
-
-                return _textureHandle;
-            }
-        }
-
         public Texture(TextureTarget textureTarget, TextureWrapMode textureWrapMode, PixelInternalFormat pixelInternalFormat, PixelFormat pixelFormat, bool enableMipmap, float[] borderColor = null)
         {
             ID = GL.GenTexture();
@@ -142,10 +130,7 @@ namespace OpenTK_PathTracer.Render.Objects
             GL.TexParameter(TextureTarget, TextureParameterName.TextureWrapS, (int)textureWrapMode);
             GL.TexParameter(TextureTarget, TextureParameterName.TextureWrapT, (int)textureWrapMode);
             if (TextureTarget == TextureTarget.TextureCubeMap)
-            {
                 GL.TexParameter(TextureTarget, TextureParameterName.TextureWrapR, (int)textureWrapMode);
-                //GL.TexParameter(TextureTarget, (TextureParameterName)All.TextureCubeMapSeamless, 1);
-            }
                 
 
             if (borderColor != null)
@@ -155,7 +140,7 @@ namespace OpenTK_PathTracer.Render.Objects
         public void SetTexImage2D(string path)
         {
             if (!File.Exists(path))
-                throw new FileNotFoundException($"Texture: Could not find the file {path}");
+                throw new FileNotFoundException($"Could not find the file {path}");
             SetTexImage2D(new Bitmap(path));
         }
         public void SetTexImage2D(Bitmap image)
@@ -175,7 +160,7 @@ namespace OpenTK_PathTracer.Render.Objects
         public void SetTexImage2DCubeMap(string path, Face textureTarget)
         {
             if (!File.Exists(path))
-                throw new FileNotFoundException($"Texture: Could not find the file {path}");
+                throw new FileNotFoundException($"Could not find the file {path}");
             SetTexImage2DCubeMap(new Bitmap(path), textureTarget);
         }
         public void SetTexImage2DCubeMap(Bitmap image, Face textureTarget)
@@ -195,16 +180,16 @@ namespace OpenTK_PathTracer.Render.Objects
         {
             for (int i = 0; i < paths.Length; i++)
                 if (!File.Exists(paths[i]))
-                    throw new FileNotFoundException($"Texture: Could not find the file {paths[i]}");
+                    throw new FileNotFoundException($"Could not find the file {paths[i]}");
             SetTexImage2DCubeMap(paths.Select(b => new Bitmap(b)).ToArray());
         }
         public void SetTexImage2DCubeMap(Bitmap[] images)
         {
             if (images.Length != 6)
-                throw new ArgumentException("EnvironmentMap: Number of images must be equal to six");
+                throw new ArgumentException("Number of images must be equal to six");
 
             if (!images.All(i => i.Width == images[0].Width && i.Height == images[0].Height))
-                throw new ArgumentException("Texture: Cubemap textures have different size");
+                throw new ArgumentException("Cubemap textures have different size");
 
             for (int i = 0; i < 6; i++)
                 SetTexImage2DCubeMap(images[i], Face.PositiveX + i);
@@ -214,7 +199,7 @@ namespace OpenTK_PathTracer.Render.Objects
         public void SetSubTexImage2DArray(string path, int index)
         {
             if (!File.Exists(path))
-                throw new FileNotFoundException($"Texture: Could not find the file {path}");
+                throw new FileNotFoundException($"Could not find the file {path}");
 
             SetSubTexImage2DArray(new Bitmap(path), index);
         }
@@ -231,7 +216,7 @@ namespace OpenTK_PathTracer.Render.Objects
         {
             for (int i = 0; i < paths.Length; i++)
                 if (!File.Exists(paths[i]))
-                    throw new FileNotFoundException($"Texture: Could not find the file {paths[i]}");
+                    throw new FileNotFoundException($"Could not find the file {paths[i]}");
 
             SetSubTexImage2DArray(paths.Select(b => new Bitmap(b)).ToArray(), offset);
         }
@@ -261,7 +246,7 @@ namespace OpenTK_PathTracer.Render.Objects
                     break;
 
                 default:
-                    Console.WriteLine($"Texture: {TextureTarget} is unsupported by this layer of abstraction");
+                    Console.WriteLine($"{TextureTarget} is unsupported by this layer of abstraction");
                     break;
             }
 
@@ -270,21 +255,8 @@ namespace OpenTK_PathTracer.Render.Objects
 
         public void GenerateMipMap()
         {
-            GL.GenerateTextureMipmap(ID);
-        }
-
-        public void MakeBindless()
-        {
-            _textureHandle = GL.Arb.GetTextureHandle(ID);
-        }
-
-        public void MakeResident()
-        {
-            GL.Arb.MakeTextureHandleResident(TextureHandle);
-        }
-        public void UnmakeResident()
-        {
-            GL.Arb.MakeTextureHandleNonResident(TextureHandle);
+            Bind();
+            GL.GenerateMipmap((GenerateMipmapTarget)TextureTarget);
         }
 
         public void AttachToImageUnit(int unit, int level, bool layered, int layer, TextureAccess textureAccess, SizedInternalFormat sizedInternalFormat)

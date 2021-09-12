@@ -6,7 +6,7 @@ namespace OpenTK_PathTracer.Render
     {
         public Texture Result { get; protected set; }
         
-        public  ShaderProgram Program { get; protected set; }
+        public ShaderProgram Program { get; protected set; }
         public Framebuffer Framebuffer { get; protected set; }
 
         public int Width => Result.Width;
