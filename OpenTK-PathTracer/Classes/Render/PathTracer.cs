@@ -88,7 +88,7 @@ namespace OpenTK_PathTracer
             Result = new Texture(TextureTarget.Texture2D, TextureWrapMode.ClampToBorder, PixelInternalFormat.Rgba32f, PixelFormat.Rgba, false);
             Result.Allocate(width, height);
 
-            Program = new ShaderProgram(new Shader(ShaderType.ComputeShader, @"Src\Shaders\PathTracing\compute.comp"));
+            Program = new ShaderProgram(new Shader(ShaderType.ComputeShader, "Src/Shaders/PathTracing/compute.comp".GetPathContent()));
 
             EnvironmentMap = environmentMap;
             RayDepth = rayDepth;
@@ -104,7 +104,7 @@ namespace OpenTK_PathTracer
         {
             //Query.Start();
 
-            EnvironmentMap.CubemapTexture.AttachToUnit(0);
+            EnvironmentMap.CubemapTexture.AttachToUnit(TextureUnit.Texture0);
             Program.Upload(0, ThisRenderNumFrame++);
             Result.AttachToImageUnit(0, 0, false, 0, TextureAccess.ReadWrite, (SizedInternalFormat)Result.PixelInternalFormat);
             
