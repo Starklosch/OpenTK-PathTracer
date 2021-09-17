@@ -66,7 +66,7 @@ namespace OpenTK_PathTracer
 
                     if (CursorVisible)
                     {
-                        MouseManager.Update(Mouse.GetState());
+                        MouseManager.Update();
                         Camera.Velocity = Vector3.Zero;
                     }
 
@@ -97,21 +97,21 @@ namespace OpenTK_PathTracer
                 //AtmosphericScatterer.Run(Camera.Position);
                 PathTracer.Run();
 
-                //Rasterizer.Run(new AABB[] { new AABB(Vector3.One, Vector3.One) });
+                Rasterizer.Run(new AABB[] { new AABB(Vector3.One, Vector3.One) });
 
                 PostProcesser.Run(PathTracer.Result, Rasterizer.Result);
 
                 Framebuffer.Clear(0, ClearBufferMask.ColorBufferBit);
-                PostProcesser.Result.AttachToUnit(0);
+                PostProcesser.Result.AttachToUnit(TextureUnit.Texture0);
                 finalProgram.Use();
                 GL.DrawArrays(PrimitiveType.Quads, 0, 4);
 
-                //if (Focused)
-                //{
-                //    Render.GUI.Final.Run(this, (float)e.Time, out bool frameChanged);
-                //    if (frameChanged)
-                //        PathTracer.ThisRenderNumFrame = 0;
-                //}
+                if (Focused)
+                {
+                    Render.GUI.Final.Run(this, (float)e.Time, out bool frameChanged);
+                    if (frameChanged)
+                        PathTracer.ThisRenderNumFrame = 0;
+                }
                 SwapBuffers();
                 fps++;
             }
@@ -130,19 +130,18 @@ namespace OpenTK_PathTracer
                 fpsTimer.Restart();
             }
             ThreadManager.InvokeQueuedActions();
-            KeyboardManager.Update(Keyboard.GetState());
-            MouseManager.Update(Mouse.GetState());
+            KeyboardManager.Update();
+            MouseManager.Update();
 
             if (Focused)
             {
-
                 if (!CursorVisible)
                 {
                     Point _point = PointToScreen(new Point(Width / 2, Height / 2));
                     Mouse.SetPosition(_point.X, _point.Y);
                 }
                 
-                //Render.GUI.Final.Update(this);
+                Render.GUI.Final.Update(this);
 
                 if (!CursorVisible)
                 {
@@ -188,14 +187,14 @@ namespace OpenTK_PathTracer
             AtmosphericScatterer = new AtmosphericScattering(128, 100, 10, 2.1f, 35.0f, 0.01f, new Vector3(700, 530, 440), new Vector3(0, 500, 0));
             AtmosphericScatterer.Run();
 
-            finalProgram = new ShaderProgram(new Shader(ShaderType.VertexShader, @"Src\Shaders\screenQuad.vs"), new Shader(ShaderType.FragmentShader, @"Src\Shaders\final.frag"));
+            finalProgram = new ShaderProgram(new Shader(ShaderType.VertexShader, "Src/Shaders/screenQuad.vs".GetPathContent()), new Shader(ShaderType.FragmentShader, "Src/Shaders/final.frag".GetPathContent()));
             GameObjectsUBO = new BufferObject(BufferRangeTarget.UniformBuffer, 1, Sphere.GPU_INSTANCE_SIZE * MAX_GAMEOBJECTS_SPHERES + Cuboid.GPU_INSTANCE_SIZE * MAX_GAMEOBJECTS_CUBOIDS, BufferUsageHint.StreamRead);
             BasicDataUBO = new BufferObject(BufferRangeTarget.UniformBuffer, 0, Vector4.SizeInBytes * 4 * 5 + Vector4.SizeInBytes * 3, BufferUsageHint.StreamRead);
             UBOCompatibleBase.BufferObject = GameObjectsUBO;
 
-            PathTracer = new PathTracing(new EnvironmentMap(AtmosphericScatterer.Result), Width, Height, 8, 1, 20f, 0.14f);
+            PathTracer = new PathTracing(new EnvironmentMap(AtmosphericScatterer.Result), Width, Height, 13, 1, 20f, 0.14f);
             Rasterizer = new Rasterizer(Width, Height);
-            PostProcesser = new ScreenEffect(new Shader(ShaderType.FragmentShader, @"Src\Shaders\PostProcessing\fragment.frag"), Width, Height);
+            PostProcesser = new ScreenEffect(new Shader(ShaderType.FragmentShader, "Src/Shaders/PostProcessing/fragment.frag".GetPathContent()), Width, Height);
             float width = 40, height = 25, depth = 25;
 
             #region Spheres
@@ -215,7 +214,7 @@ namespace OpenTK_PathTracer
                 material.SpecularChance = 0.02f;
                 material.IOR = 1.05f;
                 material.RefractionChance = 0.98f;
-                material.RefractionColor = new Vector3(1, 2, 3) * (x / balls);
+                material.AbsorbanceColor = new Vector3(1, 2, 3) * (x / balls);
                 Vector3 position = new Vector3(-dimensions.X / 2 + radius + delta.X * x, 3f, -20f);
                 GameObjects.Add(new Sphere(position, radius, PathTracer.NumSpheres++, material));
 
@@ -226,7 +225,7 @@ namespace OpenTK_PathTracer
                 material1.IOR = 1.1f;
                 material1.RefractionChance = 0.98f;
                 material1.RefractionRoughnes = x / balls;
-                material1.RefractionColor = Vector3.Zero;
+                material1.AbsorbanceColor = Vector3.Zero;
                 position = new Vector3(-dimensions.X / 2 + radius + delta.X * x, -6f, -20f);
                 GameObjects.Add(new Sphere(position, radius, PathTracer.NumSpheres++, material1));
             }
@@ -258,7 +257,6 @@ namespace OpenTK_PathTracer
             fpsTimer.Start();
         }
         
-        // Handling resize
         protected override void OnResize(EventArgs e)
         {
             if ((lastWidth != Width || lastHeight != Height) && Width != 0 && Height != 0) // dont resize when minimizing and maximizing
@@ -266,9 +264,7 @@ namespace OpenTK_PathTracer
                 PathTracer.SetSize(Width, Height);
                 Rasterizer.SetSize(Width, Height);
                 PostProcesser.SetSize(Width, Height);
-                //Render.GUI.Final.Resize(Width, Height);
-
-                //GL.Viewport(0, 0, Width, Height);
+                Render.GUI.Final.SetSize(Width, Height);
 
                 projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(FOV), Width / (float)Height, nearFarPlane.X, nearFarPlane.Y);
                 inverseProjection = projection.Inverted();
@@ -283,39 +279,34 @@ namespace OpenTK_PathTracer
         protected override void OnFocusedChanged(EventArgs e)
         {
             if (Focused)
-                MouseManager.Update(Mouse.GetState());
+                MouseManager.Update();
         }
 
-        // TODO: Re-implement ImGui without bindless access
-        #region ImGui stuff
+        protected override void OnClosed(EventArgs e)
+        {
+            ImGuiNET.ImGui.SaveIniSettingsToDisk("imgui.ini");
+            base.OnClosed(e);
+        }
 
-        //protected override void OnClosed(EventArgs e)
-        //{
-        //    //ImGuiNET.ImGui.SaveIniSettingsToDisk("imgui.ini");
-        //    base.OnClosed(e);
-        //}
+        public bool RayTrace(Ray ray, out GameObjectBase gameObject, out float t1, out float t2)
+        {
+            t1 = t2 = 0;
+            gameObject = null;
+            float tMin = float.MaxValue;
+            for (int i = 0; i < GameObjects.Count; i++)
+            {
+                if (GameObjects[i].IntersectsRay(ray, out float tempT1, out float tempT2) && tempT2 > 0 && tempT1 < tMin)
+                {
+                    t1 = tempT1; t2 = tempT2;
+                    tMin = GetSmallestPositive(t1, t2);
+                    gameObject = GameObjects[i];
+                }
+            }
 
-        //public bool RayTrace(Ray ray, out GameObject gameObject, out float t1, out float t2)
-        //{
-        //    t1 = t2 = 0;
-        //    gameObject = null;
-        //    float tMin = float.MaxValue;
-        //    for (int i = 0; i < GameObjects.Count; i++)
-        //    {
-        //        if (GameObjects[i].IntersectsRay(ray, out float tempT1, out float tempT2) && tempT2 > 0 && tempT1 < tMin)
-        //        {
-        //            t1 = tempT1; t2 = tempT2;
-        //            tMin = GetSmallestPositive(t1, t2);
-        //            gameObject = GameObjects[i];
-        //        }
-        //    }
+            return tMin != float.MaxValue;
+        }
 
-        //    return tMin != float.MaxValue;
-        //}
-
-        //public static float GetSmallestPositive(float t1, float t2) => t1 < 0 ? t2 : t1;
-
-        #endregion
+        public static float GetSmallestPositive(float t1, float t2) => t1 < 0 ? t2 : t1;
 
         public void SetGameObjectsRandomMaterial<T>(int maxNum) where T : GameObjectBase
         {

@@ -24,6 +24,7 @@ namespace OpenTK_PathTracer.Render.Objects
         public TextureTarget TextureTarget { get; private set; }
         public PixelInternalFormat PixelInternalFormat { get; private set; }
         public PixelFormat PixelFormat { get; private set; }
+        public PixelType PixelType { get; private set; }
         public TextureWrapMode TextureWrapMode { get; private set; }
         public int Width { get; private set; }
         public int Height { get; private set; }
@@ -155,6 +156,11 @@ namespace OpenTK_PathTracer.Render.Objects
             Height = image.Height;
             image.Dispose();
         }
+        public void SetSubData2D(IntPtr data)
+        {
+            Bind();
+            GL.TexSubImage2D(TextureTarget, 0, 0, 0, Width, Height, PixelFormat, PixelType, data);
+        }
 
 
         public void SetTexImage2DCubeMap(string path, Face textureTarget)
@@ -227,29 +233,29 @@ namespace OpenTK_PathTracer.Render.Objects
         }
 
 
-        public void Allocate(int width, int height, int depth = 1)
+        public void Allocate(int width, int height, int depth = 1, PixelType pixelType = PixelType.Float)
         {
             Bind();
             switch (TextureTarget)
             {
                 case TextureTarget.Texture2D:
-                    GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat, width, height, 0, PixelFormat, PixelType.Float, IntPtr.Zero);
+                    GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat, width, height, 0, PixelFormat, pixelType, IntPtr.Zero);
                     break;
 
                 case TextureTarget.TextureCubeMap:
                     for (int i = 0; i < 6; i++)
-                        GL.TexImage2D(TextureTarget.TextureCubeMapPositiveX + i, 0, PixelInternalFormat, width, height, 0, PixelFormat, PixelType.Float, IntPtr.Zero);
+                        GL.TexImage2D(TextureTarget.TextureCubeMapPositiveX + i, 0, PixelInternalFormat, width, height, 0, PixelFormat, pixelType, IntPtr.Zero);
                     break;
 
                 case TextureTarget.Texture2DArray:
-                    GL.TexImage3D(TextureTarget.Texture2DArray, 0, PixelInternalFormat, width, height, depth, 0, PixelFormat, PixelType.Float, IntPtr.Zero);
+                    GL.TexImage3D(TextureTarget.Texture2DArray, 0, PixelInternalFormat, width, height, depth, 0, PixelFormat, pixelType, IntPtr.Zero);
                     break;
 
                 default:
                     Console.WriteLine($"{TextureTarget} is unsupported by this layer of abstraction");
-                    break;
+                    return;
             }
-
+            PixelType = pixelType;
             Width = width; Height = height; Depth = depth;
         }
 
@@ -273,21 +279,17 @@ namespace OpenTK_PathTracer.Render.Objects
             GL.BindTexture(TextureTarget, 0);
         }
 
-        public void AttachToUnit(int unit)
+        public void AttachToUnit(TextureUnit textureUnit)
         {
-            //GL.BindTextureUnit(unit, ID);
-            GL.ActiveTexture(TextureUnit.Texture0 + unit);
+            GL.ActiveTexture(textureUnit);
             GL.BindTexture(TextureTarget, ID);
         }
 
-        //public static void AttachToUnit(int unit, int textureID)
-        //{
-        //    GL.BindTextureUnit(unit, textureID);
-        //}
-        //public static void DetachFromUnit(int unit)
-        //{
-        //    GL.BindTextureUnit(unit, 0);
-        //}
+        public static void AttachToUnit(TextureUnit textureUnit, TextureTarget textureTarget, int id)
+        {
+            GL.ActiveTexture(textureUnit);
+            GL.BindTexture(textureTarget, id);
+        }
 
         public void Dispose()
         {

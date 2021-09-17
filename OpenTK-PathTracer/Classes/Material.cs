@@ -10,7 +10,7 @@ namespace OpenTK_PathTracer
 
         public Vector3 Albedo;
         public Vector3 Emissiv;
-        public Vector3 RefractionColor;
+        public Vector3 AbsorbanceColor;
         public float SpecularChance;
         public float SpecularRoughness;
         public float IOR;
@@ -22,7 +22,7 @@ namespace OpenTK_PathTracer
 
             Albedo = albedo;
             Emissiv = emissiv;
-            RefractionColor = refractionColor;
+            AbsorbanceColor = refractionColor;
             SpecularChance = Math.Clamp(specularChance, 0, 1.0f - RefractionChance);
             SpecularRoughness = specularRoughness;
             IOR = Math.Max(indexOfRefraction, 1.0f);
@@ -41,7 +41,7 @@ namespace OpenTK_PathTracer
             GPUData[1].Xyz = Emissiv;
             GPUData[1].W = SpecularRoughness;
 
-            GPUData[2].Xyz = RefractionColor;
+            GPUData[2].Xyz = AbsorbanceColor;
             GPUData[2].W = RefractionChance;
 
             GPUData[3].X = RefractionRoughnes;

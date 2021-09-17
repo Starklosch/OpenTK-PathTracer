@@ -17,7 +17,7 @@ namespace OpenTK_PathTracer.Render
 
             Framebuffer.AddRenderTarget(FramebufferAttachment.ColorAttachment0, Result);
 
-            Program = new ShaderProgram(new Shader(ShaderType.VertexShader, @"Src\Shaders\screenQuad.vs"), fragmentShader);
+            Program = new ShaderProgram(new Shader(ShaderType.VertexShader, "Src/Shaders/screenQuad.vs".GetPathContent()), fragmentShader);
         }
 
         public override void Run(params object[] textureArr)
@@ -30,7 +30,7 @@ namespace OpenTK_PathTracer.Render
             Program.Use();
 
             for (int i = 0; i < textureArr.Length; i++)
-                (textureArr[i] as Texture)?.AttachToUnit(i);
+                (textureArr[i] as Texture)?.AttachToUnit(TextureUnit.Texture0 + i);
             GL.DrawArrays(PrimitiveType.Quads, 0, 4);
 
             //Query.StopAndReset();

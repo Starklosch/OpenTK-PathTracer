@@ -8,24 +8,19 @@ namespace OpenTK_PathTracer.Render.Objects
     struct Shader : IDisposable
     {
         public readonly int ID;
-        public readonly string Path;
         public readonly ShaderType ShaderType;
 
-        public Shader(ShaderType shaderType, string path)
+        public Shader(ShaderType shaderType, string sourceCode)
         {
-            if (!System.IO.File.Exists(path))
-                throw new System.IO.FileNotFoundException($"{path} does not exist");
-
-            Path = path;
             ShaderType = shaderType;
             
             ID = GL.CreateShader(shaderType);
-            GL.ShaderSource(ID, System.IO.File.ReadAllText(path));
+            GL.ShaderSource(ID, sourceCode);
             GL.CompileShader(ID);
 
             string compileInfo = GL.GetShaderInfoLog(ID);
             if (compileInfo != string.Empty)
-                Console.WriteLine($"Error under {path}. {compileInfo}");
+                Console.WriteLine(compileInfo);
         }
 
         public void Dispose()

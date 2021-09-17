@@ -102,7 +102,7 @@ namespace OpenTK_PathTracer.Render
             Result = new Texture(TextureTarget.TextureCubeMap, TextureWrapMode.ClampToBorder, PixelInternalFormat.Rgba32f, PixelFormat.Rgba, false);
             Result.Allocate(size, size);
 
-            Program = new ShaderProgram(new Shader(ShaderType.ComputeShader, @"Src\Shaders\AtmosphericScattering\compute.comp"));
+            Program = new ShaderProgram(new Shader(ShaderType.ComputeShader, "Src/Shaders/AtmosphericScattering/compute.comp".GetPathContent()));
             bufferObject = new BufferObject(BufferRangeTarget.UniformBuffer, 3, Vector4.SizeInBytes * 4 * 7 + Vector4.SizeInBytes, BufferUsageHint.StreamRead);
 
             Matrix4 invProjection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(90), 1, 0.1f, 10f).Inverted();
@@ -143,7 +143,7 @@ namespace OpenTK_PathTracer.Render
             if (viewPos.Length == 1)
                 bufferObject.SubData(Vector4.SizeInBytes * 4 * 7, Vector4.SizeInBytes, new Vector4((Vector3)viewPos[0], 1.0f));
 
-            GL.DispatchCompute((int)MathF.Ceiling(Width / 32.0f), (int)MathF.Ceiling(Width / 32.0f), 6);
+            GL.DispatchCompute((int)MathF.Ceiling(Width / 8.0f), (int)MathF.Ceiling(Width / 8.0f), 6);
             GL.MemoryBarrier(MemoryBarrierFlags.ShaderImageAccessBarrierBit);
 
             //Query.StopAndReset();

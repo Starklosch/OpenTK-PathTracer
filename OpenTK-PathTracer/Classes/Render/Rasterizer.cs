@@ -18,14 +18,13 @@ namespace OpenTK_PathTracer.Render
             
             Framebuffer.AddRenderTarget(FramebufferAttachment.ColorAttachment0, Result);
             
-            Program = new ShaderProgram(new Shader(ShaderType.VertexShader, @"Src\Shaders\Rasterisation\vertex.vert"), new Shader(ShaderType.FragmentShader, @"Src\Shaders\Rasterisation\fragment.frag"));
+            Program = new ShaderProgram(new Shader(ShaderType.VertexShader, "Src/Shaders/Rasterisation/vertex.vert".GetPathContent()), new Shader(ShaderType.FragmentShader, "Src/Shaders/Rasterisation/fragment.frag".GetPathContent()));
 
-            vao = new VAO();
-            {
-                vbo = new BufferObject(BufferTarget.ArrayBuffer, unitCubeVerts.Length * sizeof(float), BufferUsageHint.StaticDraw);
-                vbo.Append(unitCubeVerts.Length * sizeof(float), unitCubeVerts);
-                vao.SetAttribPointer(0, 3, VertexAttribPointerType.Float, 3 * sizeof(float), 0 * sizeof(float));
-            }
+            vbo = new BufferObject(BufferTarget.ArrayBuffer, unitCubeVerts.Length * sizeof(float), BufferUsageHint.StaticDraw);
+            vbo.Append(unitCubeVerts.Length * sizeof(float), unitCubeVerts);
+
+            vao = new VAO(vbo, 3 * sizeof(float));
+            vao.SetAttribPointer(0, 3, VertexAttribPointerType.Float, 0 * sizeof(float));
         }
 
         public override void Run(params object[] aabbArr)

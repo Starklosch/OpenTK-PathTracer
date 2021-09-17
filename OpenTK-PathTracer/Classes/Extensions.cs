@@ -15,11 +15,12 @@ namespace OpenTK_PathTracer
             return arr0;
         }
 
-        public static byte[] ToByteArray(this Image img, System.Drawing.Imaging.ImageFormat imageFormat)
+        public static string GetPathContent(this string path)
         {
-            using MemoryStream stream = new MemoryStream();
-            img.Save(stream, imageFormat);
-            return stream.ToArray();
+            if (!File.Exists(path))
+                throw new FileNotFoundException($"{path} does not exist");
+
+            return File.ReadAllText(path);
         }
     }
 }
