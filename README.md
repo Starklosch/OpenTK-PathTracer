@@ -5,7 +5,6 @@
 This is a working fork of [this repo](https://github.com/JulianStambuk/OpenTK-PathTracer/tree/master) with some differences:
 - Doesn't depend on ARB_bindless_texture, ARB_direct_state_access and ARB_seamless_cubemap_per_texture
 - Compatible with OpenGL 4.3 and newer.
-- ImGui not implemented yet.
 - Minor changes.
 
 ---
@@ -18,7 +17,7 @@ Due to the realistic nature of Path Tracers various effects like Soft Shadows, R
 
 The renderer also features [Depth of Field](https://en.wikipedia.org/wiki/Depth_of_field), which can be controlled with two variables at runtime through [ImGui](https://github.com/ocornut/imgui).
 `FocalLength` is the distance an object appears in focus.
-`ApertureRadius` controlls how strongly objects out of focus are blured.
+`ApertureDiamter` controlls how strongly objects out of focus are blured.
 
 If a ray does not hit any object the color is retrieved from a precomputed cubemap.
 The atmospheric scattering in this cubemap is calculated in yet an other Compute Shader at startup.

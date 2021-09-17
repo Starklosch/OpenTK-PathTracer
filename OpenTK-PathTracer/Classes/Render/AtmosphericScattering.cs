@@ -143,7 +143,7 @@ namespace OpenTK_PathTracer.Render
             if (viewPos.Length == 1)
                 bufferObject.SubData(Vector4.SizeInBytes * 4 * 7, Vector4.SizeInBytes, new Vector4((Vector3)viewPos[0], 1.0f));
 
-            GL.DispatchCompute((int)MathF.Ceiling(Width / 32.0f), (int)MathF.Ceiling(Width / 32.0f), 6);
+            GL.DispatchCompute((int)MathF.Ceiling(Width / 8.0f), (int)MathF.Ceiling(Width / 8.0f), 6);
             GL.MemoryBarrier(MemoryBarrierFlags.ShaderImageAccessBarrierBit);
 
             //Query.StopAndReset();

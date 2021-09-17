@@ -22,46 +22,8 @@ namespace OpenTK_PathTracer.Render.GUI
             frameChanged = false;
             ImGui.SetNextWindowBgAlpha(windowAlpha);
 
-            ImGui.Begin("PathTracing", ImGuiWindowFlags.AlwaysAutoResize);
+            ImGui.Begin("Overview");
             {
-                ImGui.Text($"VSync: {mainWindow.VSync}");
-                ImGui.Text($"FPS: {mainWindow.FPS}"); ImGui.SameLine(); ImGui.Text($"UPS: {mainWindow.UPS}");
-                ImGui.Checkbox("RenderInBackground", ref mainWindow.IsRenderInBackground);
-                int temp = mainWindow.PathTracer.SSP;
-                if (ImGui.SliderInt("SSP", ref temp, 1, 10))
-                {
-                    frameChanged = true;
-                    mainWindow.PathTracer.SSP = temp;
-                }
-
-
-                temp = mainWindow.PathTracer.RayDepth;
-                if (ImGui.SliderInt("RayDepth", ref temp, 1, 50))
-                {
-                    frameChanged = true;
-                    mainWindow.PathTracer.RayDepth = temp;
-                }
-
-                float floatTemp = mainWindow.PathTracer.FocalLength;
-                if (ImGui.InputFloat("FocalLength", ref floatTemp, 0.1f))
-                {
-                    frameChanged = true;
-                    mainWindow.PathTracer.FocalLength = MathF.Max(floatTemp, 0);
-                }
-
-                floatTemp = mainWindow.PathTracer.ApertureDiameter;
-                if (ImGui.InputFloat("ApertureDiameter", ref floatTemp, 0.002f))
-                {
-                    frameChanged = true;
-                    mainWindow.PathTracer.ApertureDiameter = MathF.Max(floatTemp, 0);
-                }
-                ImGui.Text($"f-number: f/{mainWindow.PathTracer.FocalLength / mainWindow.PathTracer.ApertureDiameter}");
-
-                if (ImGui.Button("SpheresRandomMaterial"))
-                {
-                    frameChanged = true;
-                    mainWindow.SetGameObjectsRandomMaterial<Sphere>(36);
-                }
                 if (ImGui.Button("Screenshot"))
                 {
                     System.IO.Directory.CreateDirectory("Screenshots");
@@ -69,93 +31,109 @@ namespace OpenTK_PathTracer.Render.GUI
                     bmp.Save($@"Screenshots\Samples_{mainWindow.PathTracer.Samples}.png", System.Drawing.Imaging.ImageFormat.Jpeg);
                     bmp.Dispose();
                 }
+                if (ImGui.CollapsingHeader("PathTracing"))
+                {
+                    ImGui.Text($"VSync: {mainWindow.VSync}");
+                    ImGui.Text($"FPS: {mainWindow.FPS}"); ImGui.SameLine(); ImGui.Text($"UPS: {mainWindow.UPS}");
+                    ImGui.Checkbox("RenderInBackground", ref mainWindow.IsRenderInBackground);
+                    int temp = mainWindow.PathTracer.SSP;
+                    if (ImGui.SliderInt("SSP", ref temp, 1, 10))
+                    {
+                        frameChanged = true;
+                        mainWindow.PathTracer.SSP = temp;
+                    }
+
+
+                    temp = mainWindow.PathTracer.RayDepth;
+                    if (ImGui.SliderInt("RayDepth", ref temp, 1, 50))
+                    {
+                        frameChanged = true;
+                        mainWindow.PathTracer.RayDepth = temp;
+                    }
+
+                    float floatTemp = mainWindow.PathTracer.FocalLength;
+                    if (ImGui.InputFloat("FocalLength", ref floatTemp, 0.1f))
+                    {
+                        frameChanged = true;
+                        mainWindow.PathTracer.FocalLength = MathF.Max(floatTemp, 0);
+                    }
+
+                    floatTemp = mainWindow.PathTracer.ApertureDiameter;
+                    if (ImGui.InputFloat("ApertureDiameter", ref floatTemp, 0.002f))
+                    {
+                        frameChanged = true;
+                        mainWindow.PathTracer.ApertureDiameter = MathF.Max(floatTemp, 0);
+                    }
+                    ImGui.Text($"f-number: f/{mainWindow.PathTracer.FocalLength / mainWindow.PathTracer.ApertureDiameter}");
+
+                    if (ImGui.Button("SpheresRandomMaterial"))
+                    {
+                        frameChanged = true;
+                        mainWindow.SetGameObjectsRandomMaterial<Sphere>(36);
+                    }
+                    if (ImGui.Button("Screenshot"))
+                    {
+                        System.IO.Directory.CreateDirectory("Screenshots");
+                        System.Drawing.Bitmap bmp = Screenshotter.DoScreenshot(mainWindow.Width, mainWindow.Height);
+                        bmp.Save($@"Screenshots\Samples_{mainWindow.PathTracer.Samples}.png", System.Drawing.Imaging.ImageFormat.Jpeg);
+                        bmp.Dispose();
+                    }
+                }
+                if (ImGui.CollapsingHeader("AtmossphericScattering"))
+                {
+                    int tempInt = mainWindow.AtmosphericScatterer.InScatteringSamples;
+                    if (ImGui.SliderInt("InScatteringSamples", ref tempInt, 1, 100))
+                    {
+                        frameChanged = true;
+                        mainWindow.AtmosphericScatterer.InScatteringSamples = tempInt;
+                        mainWindow.AtmosphericScatterer.Run();
+                    }
+
+                    tempInt = mainWindow.AtmosphericScatterer.DensitySamples;
+                    if (ImGui.SliderInt("DensitySamples", ref tempInt, 1, 40))
+                    {
+                        frameChanged = true;
+                        mainWindow.AtmosphericScatterer.DensitySamples = tempInt;
+                        mainWindow.AtmosphericScatterer.Run();
+                    }
+
+                    float temp = mainWindow.AtmosphericScatterer.ScatteringStrength;
+                    if (ImGui.DragFloat("ScatteringStrength", ref temp, 0.15f, 0.1f, 10))
+                    {
+                        frameChanged = true;
+                        mainWindow.AtmosphericScatterer.ScatteringStrength = temp;
+                        mainWindow.AtmosphericScatterer.Run();
+                    }
+
+                    temp = mainWindow.AtmosphericScatterer.DensityFallOff;
+                    if (ImGui.DragFloat("DensityFallOff", ref temp, 0.5f, 0.1f, 40))
+                    {
+                        frameChanged = true;
+                        mainWindow.AtmosphericScatterer.DensityFallOff = temp;
+                        mainWindow.AtmosphericScatterer.Run();
+                    }
+
+                    temp = mainWindow.AtmosphericScatterer.AtmossphereRadius;
+                    if (ImGui.DragFloat("AtmossphereRadius", ref temp, 0.2f, 0.1f, 100))
+                    {
+                        frameChanged = true;
+                        mainWindow.AtmosphericScatterer.AtmossphereRadius = temp;
+                        mainWindow.AtmosphericScatterer.Run();
+                    }
+
+                    System.Numerics.Vector3 nVector3;
+                    nVector3 = Vector3ToNVector3(mainWindow.AtmosphericScatterer.WaveLengths);
+                    if (ImGui.InputFloat3("Wavelength (nm)", ref nVector3))
+                    {
+                        frameChanged = true;
+                        mainWindow.AtmosphericScatterer.WaveLengths = NVector3ToVector3(nVector3);
+                        mainWindow.AtmosphericScatterer.Run();
+                    }
+                }
 
                 ImGui.End();
             }
-
-            ImGui.Begin("AtmossphericScattering", ImGuiWindowFlags.AlwaysAutoResize);
-            {
-                int tempInt = mainWindow.AtmosphericScatterer.InScatteringSamples;
-                if (ImGui.SliderInt("InScatteringSamples", ref tempInt, 1, 100))
-                {
-                    frameChanged = true;
-                    mainWindow.AtmosphericScatterer.InScatteringSamples = tempInt;
-                    mainWindow.AtmosphericScatterer.Run();
-                }
-
-                tempInt = mainWindow.AtmosphericScatterer.DensitySamples;
-                if (ImGui.SliderInt("DensitySamples", ref tempInt, 1, 40))
-                {
-                    frameChanged = true;
-                    mainWindow.AtmosphericScatterer.DensitySamples = tempInt;
-                    mainWindow.AtmosphericScatterer.Run();
-                }
-
-                float temp = mainWindow.AtmosphericScatterer.ScatteringStrength;
-                if (ImGui.DragFloat("ScatteringStrength", ref temp, 0.15f, 0.1f, 10))
-                {
-                    frameChanged = true;
-                    mainWindow.AtmosphericScatterer.ScatteringStrength = temp;
-                    mainWindow.AtmosphericScatterer.Run();
-                }
-
-                temp = mainWindow.AtmosphericScatterer.DensityFallOff;
-                if (ImGui.DragFloat("DensityFallOff", ref temp, 0.5f, 0.1f, 40))
-                {
-                    frameChanged = true;
-                    mainWindow.AtmosphericScatterer.DensityFallOff = temp;
-                    mainWindow.AtmosphericScatterer.Run();
-                }
-
-                temp = mainWindow.AtmosphericScatterer.AtmossphereRadius;
-                if (ImGui.DragFloat("AtmossphereRadius", ref temp, 0.2f, 0.1f, 100))
-                {
-                    frameChanged = true;
-                    mainWindow.AtmosphericScatterer.AtmossphereRadius = temp;
-                    mainWindow.AtmosphericScatterer.Run();
-                }
-
-                System.Numerics.Vector3 nVector3;
-                nVector3 = Vector3ToNVector3(mainWindow.AtmosphericScatterer.WaveLengths);
-                if (ImGui.InputFloat3("Wavelength (nm)", ref nVector3))
-                {
-                    frameChanged = true;
-                    mainWindow.AtmosphericScatterer.WaveLengths = NVector3ToVector3(nVector3);
-                    mainWindow.AtmosphericScatterer.Run();
-                }
-
-                ImGui.End();
-            }
-
-            ImGui.Begin("AddPrimitiv");
-            {
-                if (ImGui.Button("Sphere"))
-                {
-                    Ray viewRay = new Ray(mainWindow.Camera.Position, mainWindow.Camera.ViewDir);
-                    Sphere newSphere = Sphere.Zero;
-                    newSphere.Position = viewRay.GetPoint(1.5f);
-                    newSphere.Instance = mainWindow.PathTracer.NumSpheres++;
-                    newSphere.Upload();
-                    mainWindow.GameObjects.Add(newSphere);
-
-                    pickedObject = newSphere;
-                    frameChanged = true;
-                }
-
-                if (ImGui.Button("Cuboid"))
-                {
-                    Ray viewRay = new Ray(mainWindow.Camera.Position, mainWindow.Camera.ViewDir);
-                    Cuboid newCuboid = Cuboid.Zero;
-                    newCuboid.Position = viewRay.GetPoint(1.5f);
-                    newCuboid.Instance = mainWindow.PathTracer.NumCuboids++;
-                    newCuboid.Upload();
-                    mainWindow.GameObjects.Add(newCuboid);
-
-                    pickedObject = newCuboid;
-                    frameChanged = true;
-                }
-                ImGui.End();
-            }
+            
 
             if (pickedObject != null)
             {
@@ -187,10 +165,10 @@ namespace OpenTK_PathTracer.Render.GUI
                         hasInput = true;
                     }
 
-                    nVector3 = Vector3ToNVector3(pickedObject.Material.RefractionColor);
+                    nVector3 = Vector3ToNVector3(pickedObject.Material.AbsorbanceColor);
                     if (ImGui.InputFloat3("RefractionColor", ref nVector3))
                     {
-                        pickedObject.Material.RefractionColor = NVector3ToVector3(nVector3);
+                        pickedObject.Material.AbsorbanceColor = NVector3ToVector3(nVector3);
                         hasInput = true;
                     }
 

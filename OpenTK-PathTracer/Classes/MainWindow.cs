@@ -192,7 +192,7 @@ namespace OpenTK_PathTracer
             BasicDataUBO = new BufferObject(BufferRangeTarget.UniformBuffer, 0, Vector4.SizeInBytes * 4 * 5 + Vector4.SizeInBytes * 3, BufferUsageHint.StreamRead);
             UBOCompatibleBase.BufferObject = GameObjectsUBO;
 
-            PathTracer = new PathTracing(new EnvironmentMap(AtmosphericScatterer.Result), Width, Height, 8, 1, 20f, 0.14f);
+            PathTracer = new PathTracing(new EnvironmentMap(AtmosphericScatterer.Result), Width, Height, 13, 1, 20f, 0.14f);
             Rasterizer = new Rasterizer(Width, Height);
             PostProcesser = new ScreenEffect(new Shader(ShaderType.FragmentShader, "Src/Shaders/PostProcessing/fragment.frag".GetPathContent()), Width, Height);
             float width = 40, height = 25, depth = 25;
@@ -214,7 +214,7 @@ namespace OpenTK_PathTracer
                 material.SpecularChance = 0.02f;
                 material.IOR = 1.05f;
                 material.RefractionChance = 0.98f;
-                material.RefractionColor = new Vector3(1, 2, 3) * (x / balls);
+                material.AbsorbanceColor = new Vector3(1, 2, 3) * (x / balls);
                 Vector3 position = new Vector3(-dimensions.X / 2 + radius + delta.X * x, 3f, -20f);
                 GameObjects.Add(new Sphere(position, radius, PathTracer.NumSpheres++, material));
 
@@ -225,7 +225,7 @@ namespace OpenTK_PathTracer
                 material1.IOR = 1.1f;
                 material1.RefractionChance = 0.98f;
                 material1.RefractionRoughnes = x / balls;
-                material1.RefractionColor = Vector3.Zero;
+                material1.AbsorbanceColor = Vector3.Zero;
                 position = new Vector3(-dimensions.X / 2 + radius + delta.X * x, -6f, -20f);
                 GameObjects.Add(new Sphere(position, radius, PathTracer.NumSpheres++, material1));
             }

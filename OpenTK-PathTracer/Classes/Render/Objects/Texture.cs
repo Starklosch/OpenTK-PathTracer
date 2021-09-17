@@ -158,7 +158,8 @@ namespace OpenTK_PathTracer.Render.Objects
         }
         public void SetSubData2D(IntPtr data)
         {
-            GL.TextureSubImage2D(ID, 0, 0, 0, Width, Height, PixelFormat, PixelType, data);
+            Bind();
+            GL.TexSubImage2D(TextureTarget, 0, 0, 0, Width, Height, PixelFormat, PixelType, data);
         }
 
 
