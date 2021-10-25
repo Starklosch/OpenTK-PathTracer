@@ -7,31 +7,28 @@ namespace OpenTK_PathTracer.Render.Objects
     {
         private static int lastBindedID = -1;
 
-
-        private readonly BufferObject vbo, ebo;
         public readonly int VertexSize;
         public readonly int ID;
         public VAO(BufferObject arrayBuffer, int vertexSize)
         {
-            vbo = arrayBuffer;
             VertexSize = vertexSize;
             ID = GL.GenVertexArray();
             GL.BindVertexArray(ID);
+            GL.BindVertexBuffer(0, arrayBuffer.ID, IntPtr.Zero, vertexSize);
         }
 
         public VAO(BufferObject arrayBuffer, BufferObject elementBuffer, int vertexSize)
         {
-            vbo = arrayBuffer;
-            ebo = elementBuffer;
             VertexSize = vertexSize;
+            
             ID = GL.GenVertexArray();
             GL.BindVertexArray(ID);
+            GL.BindVertexBuffer(0, arrayBuffer.ID, IntPtr.Zero, vertexSize);
+            elementBuffer.Bind(BufferTarget.ElementArrayBuffer);
         }
 
         public void SetAttribPointer(int index, int attribTypeElements, VertexAttribPointerType vertexAttribPointerType, int offset, bool normalize = false)
         {
-            vbo.Bind(BufferTarget.ArrayBuffer);
-            vbo.Bind(BufferTarget.ElementArrayBuffer);
             GL.VertexAttribPointer(index, attribTypeElements, vertexAttribPointerType, normalize, VertexSize, offset);
             GL.EnableVertexAttribArray(index);
         }

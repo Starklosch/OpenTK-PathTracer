@@ -329,6 +329,7 @@ namespace OpenTK_PathTracer
         public void SetGameObjectsRandomMaterial<T>(int maxNum) where T : BaseGameObject
         {
             int changed = 0;
+            GameObjectsUBO.Bind(BufferTarget.UniformBuffer);
             for (int i = 0; i < GameObjects.Count && changed < maxNum; i++)
             {
                 if (GameObjects[i] is T)

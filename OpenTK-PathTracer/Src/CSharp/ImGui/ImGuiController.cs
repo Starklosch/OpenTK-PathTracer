@@ -281,7 +281,8 @@ namespace OpenTK_PathTracer.GUI
                     }
                     else
                     {
-                        GL.BindTextureUnit(0, (int)pcmd.TextureId);
+                        GL.ActiveTexture(TextureUnit.Texture0);
+                        GL.BindTexture(TextureTarget.Texture2D, (int)pcmd.TextureId);
 
                         // We do _windowHeight - (int)clip.W instead of (int)clip.Y because gl has flipped Y when it comes to these coordinates
                         var clip = pcmd.ClipRect;
