@@ -103,6 +103,7 @@ namespace OpenTK_PathTracer
 
                 PostProcesser.Run(PathTracer.Result, Rasterizer.Result);
 
+                GL.Viewport(0, 0, Width, Height);
                 Framebuffer.Clear(0, ClearBufferMask.ColorBufferBit);
                 PostProcesser.Result.AttachSampler(TextureUnit.Texture0);
                 finalProgram.Use();
@@ -210,6 +211,7 @@ namespace OpenTK_PathTracer
             BasicDataUBO.MutableAllocate(Vector4.SizeInBytes * 4 * 5 + Vector4.SizeInBytes * 3, IntPtr.Zero, BufferUsageHint.StaticDraw);
             GameObjectsUBO = new BufferObject(BufferRangeTarget.UniformBuffer, 1);
             GameObjectsUBO.MutableAllocate(Sphere.GPU_INSTANCE_SIZE * MAX_GAMEOBJECTS_SPHERES + Cuboid.GPU_INSTANCE_SIZE * MAX_GAMEOBJECTS_CUBOIDS, IntPtr.Zero, BufferUsageHint.StaticDraw);
+
             float width = 40, height = 25, depth = 25;
             #region Spheres
 
@@ -275,9 +277,15 @@ namespace OpenTK_PathTracer
         {
             if ((lastWidth != Width || lastHeight != Height) && Width != 0 && Height != 0) // dont resize when minimizing and maximizing
             {
+                PathTracer.Result.Bind(TextureTarget.Texture2D);
                 PathTracer.SetSize(Width, Height);
+
+                Rasterizer.Result.Bind(TextureTarget.Texture2D);
                 Rasterizer.SetSize(Width, Height);
+
+                PostProcesser.Result.Bind(TextureTarget.Texture2D);
                 PostProcesser.SetSize(Width, Height);
+
                 Render.GUI.Final.SetSize(Width, Height);
 
                 projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(FOV), Width / (float)Height, nearFarPlane.X, nearFarPlane.Y);
@@ -290,7 +298,12 @@ namespace OpenTK_PathTracer
             }
             base.OnResize(e);
         }
-       
+
+        protected override void OnKeyPress(KeyPressEventArgs e)
+        {
+            Render.GUI.Final.ImGuiController.PressChar(e.KeyChar);
+        }
+
         protected override void OnFocusedChanged(EventArgs e)
         {
             if (Focused)
