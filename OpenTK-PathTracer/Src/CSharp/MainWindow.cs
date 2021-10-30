@@ -312,7 +312,7 @@ namespace OpenTK_PathTracer
 
         protected override void OnClosed(EventArgs e)
         {
-            ImGuiNET.ImGui.SaveIniSettingsToDisk("imgui.ini");
+            ImGuiNET.ImGui.SaveIniSettingsToDisk("Res/imgui.ini");
             base.OnClosed(e);
         }
 
